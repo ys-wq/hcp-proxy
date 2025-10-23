@@ -1,5 +1,6 @@
+// api/quote.js
 export default async function handler(req, res) {
-  // Autoriser tout le monde à appeler (CORS)
+  // CORS
   res.setHeader("Access-Control-Allow-Origin", "*")
   res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS")
   res.setHeader("Access-Control-Allow-Headers", "content-type")
@@ -7,30 +8,20 @@ export default async function handler(req, res) {
 
   const isin = (req.query.isin || "CH1115678950-CHF").toString()
 
-  const url =
-    "https://data-feed.bxs-dev.ch/proxy/mdp-auth/v1/solid/quotes/bxswiss/" +
-    `?keytype=ISIN_ISOCUR&listID=${encodeURIComponent(isin)}` +
-    "&fieldList=PRICE_DISPLAY,LVAL_NORM"
+  // ⇩⇩ Ton Apps Script (celui qui renvoie { ok, price, ts })
+  const SOURCE = "https://script.google.com/macros/s/AKfycbyyD-Q2GB1tHicP19MNVMyqa71Rew5-Cy_2631Gb2Q3TzKvGpWI7Rr2omcQHFwV4QgmFw/exec"
 
   try {
-    const r = await fetch(url, {
-      headers: {
-        Referer: "https://bxplus.ch/",
-        Origin: "https://bxplus.ch",
-        "User-Agent": "Mozilla/5.0",
-      },
-    })
-
-    if (!r.ok) return res.status(502).json({ ok: false, price: null, ts: null })
+    const r = await fetch(`${SOURCE}?isin=${encodeURIComponent(isin)}`, { cache: "no-store" })
+    if (!r.ok) return res.status(502).json({ ok: false, price: null, ts: null, from: "apps-script", code: r.status })
 
     const j = await r.json()
-    const f = j?.records?.[0]?.fields || {}
-    const raw = f?.LVAL_NORM?.v ?? f?.PRICE_DISPLAY?.v ?? null
-    const ts  = f?.LVAL_NORM?.d ?? null
-    const price = raw == null ? null : Number(String(raw).replace(",", "."))
-
-    return res.status(200).json({ ok: true, price, ts })
+    // Normalise la sortie
+    const price = (j && j.price != null) ? Number(j.price) : null
+    const ts = j && j.ts ? j.ts : null
+    return res.status(200).json({ ok: price != null, price, ts })
   } catch (e) {
-    return res.status(500).json({ ok: false, price: null, ts: null })
+    return res.status(500).json({ ok: false, price: null, ts: null, err: "fetch-failed" })
   }
 }
+
