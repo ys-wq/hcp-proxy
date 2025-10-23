@@ -34,12 +34,12 @@ export default async function handler(req, res) {
       }
     }
 
-    return res.status(200).json({ 
-      ok: price != null, 
-      price, 
-      ts, 
-      lastTransactionDate 
-    })
+  return res.status(200).json({ 
+  ok: price != null, 
+  price, 
+  ts, 
+  tradeTs: j?.tradeTs || null 
+})
   } catch (e) {
     return res.status(500).json({ ok: false, price: null, ts: null, lastTransactionDate: null, err: "fetch-failed" })
   }
