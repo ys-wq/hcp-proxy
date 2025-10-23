@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   const isin = (req.query.isin || "CH1115678950-CHF").toString()
 
   // Ton Apps Script (celui qui renvoie { ok, price, ts })
-  const SOURCE = "https://script.google.com/macros/s/AKfycbyyD-Q2GB1tHicP19MNVMyqa71Rew5-Cy_2631Gb2Q3TzKvGpWI7Rr2omcQHFwV4QgmFw/exec"
+  const SOURCE = "https://script.google.com/macros/s/AKfycbyYm2jW3PWzoUfpNTBt-bMUTVvMxKzHvufTSP_XtS9YefuzvQBz8ZBFDIJnweMPC_m7vQ/exec"
 
   try {
     const r = await fetch(`${SOURCE}?isin=${encodeURIComponent(isin)}`, { cache: "no-store" })
