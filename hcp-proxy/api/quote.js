@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   const isin = (req.query.isin || "CH1115678950-CHF").toString();
 
   // ⇩ ton URL Apps Script (terminant par /exec)
-  const SOURCE = "https://script.google.com/macros/s/XXXXXXXXXXXX/exec";
+  const SOURCE = "https://script.google.com/macros/s/AKfycbzeUe0lng9yfhpH1FyFL2m3ZZ3gluXavv_w5SW9aAJr6dp1D81tQ0bV3fm4kt7Afpd9sw/exec";
 
   try {
     const r = await fetch(`${SOURCE}?isin=${encodeURIComponent(isin)}&t=${Date.now()}`, { cache: "no-store" });
