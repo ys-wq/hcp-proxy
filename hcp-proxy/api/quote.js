@@ -21,12 +21,22 @@ export default async function handler(req, res) {
     // ❗️C’est CE formatage "simple" qui pouvait donner l’heure "fausse"
     // (conversion naïve UTC -> toISOString locale-like)
     let lastTransactionDate = null;
-    if (ts) {
-      try {
-        const d = new Date(ts);
-        lastTransactionDate = d.toISOString().replace("T", " ").substring(0, 19);
-      } catch (e) { /* ignore */ }
-    }
+if (ts) {
+  try {
+    const d = new Date(ts);
+    // On force l'affichage en Europe/Zurich
+    lastTransactionDate = d.toLocaleString("fr-CH", {
+      timeZone: "Europe/Zurich",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).replace(",", "");
+  } catch (e) { /* ignore */ }
+}
+
 
     return res.status(200).json({ ok: price != null, price, ts, lastTransactionDate });
   } catch {
